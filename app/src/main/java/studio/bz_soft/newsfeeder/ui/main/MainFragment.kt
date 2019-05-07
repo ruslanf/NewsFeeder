@@ -11,15 +11,16 @@ import studio.bz_soft.newsfeeder.root.BackPressedInterface
 
 class MainFragment : Fragment(), BackPressedInterface {
 
-    private fun getCurrentFragment() : Fragment? = view?.let {
-        childFragmentManager.findFragmentById(it.flMain.id)
-    }
+    private fun getCurrentFragment(): Fragment? =
+        view?.let {
+            childFragmentManager.findFragmentById(it.flMain.id)
+        }
 
-    override fun onCreateView(inflater: LayoutInflater,
-                              container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_main, container, false)
-    }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? = inflater.inflate(R.layout.fragment_main, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -40,7 +41,7 @@ class MainFragment : Fragment(), BackPressedInterface {
     }
 
     override fun onBackPressed(): Boolean =
-            (getCurrentFragment() as? BackPressedInterface)?.onBackPressed() ?: false
+        (getCurrentFragment() as? BackPressedInterface)?.onBackPressed() ?: false
 
     companion object {
         fun instance(): MainFragment = MainFragment()

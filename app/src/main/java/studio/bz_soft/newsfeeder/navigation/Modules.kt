@@ -4,6 +4,7 @@ import android.content.Context
 import kotlinx.coroutines.NonCancellable.start
 import kotlinx.coroutines.channels.Channel
 import org.koin.android.ext.koin.androidApplication
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module.module
 import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.NavigatorHolder
@@ -17,7 +18,7 @@ import studio.bz_soft.newsfeeder.root.MainRouter
 val appModule = module {
     single { androidApplication() as App }
     factory { (name: String) -> get<App>().getSharedPreferences(name, Context.MODE_PRIVATE) }
-    single { ApiClient(Constants.API_MAIN_URL) }
+    single { ApiClient(Constants.API_MAIN_URL, androidContext()) }
     single { Repository(get()) }
 }
 
