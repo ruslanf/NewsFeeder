@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menuTitleNewsUpdates"
+        android:icon="@drawable/ic_news"
+        android:title="@string/main_menu_title_news_updates"/>
+    <item
+        android:id="@+id/menuTitleMore"
+        android:icon="@drawable/ic_menu"
+        android:title="@string/main_menu_title_more" />
+</menu>
