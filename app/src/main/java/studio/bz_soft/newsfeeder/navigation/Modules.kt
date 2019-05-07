@@ -8,12 +8,17 @@ import org.koin.dsl.module.module
 import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
+import studio.bz_soft.newsfeeder.data.Repository
+import studio.bz_soft.newsfeeder.data.http.ApiClient
 import studio.bz_soft.newsfeeder.root.App
+import studio.bz_soft.newsfeeder.root.Constants
 import studio.bz_soft.newsfeeder.root.MainRouter
 
 val appModule = module {
     single { androidApplication() as App }
     factory { (name: String) -> get<App>().getSharedPreferences(name, Context.MODE_PRIVATE) }
+    single { ApiClient(Constants.API_MAIN_URL) }
+    single { Repository(get()) }
 }
 
 val navigatorModule = module {
