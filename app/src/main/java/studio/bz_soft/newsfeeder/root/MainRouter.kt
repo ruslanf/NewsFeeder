@@ -10,11 +10,11 @@ import ru.terrakok.cicerone.Screen
 
 class MainRouter(router: Router, channel: Channel<(Router) -> Unit>) : RouterChannel<Screens>(router, channel)
 
-abstract class RouterChannel<S>(protected val router: Router,
-                                protected val channel: Channel<(Router) -> Unit>) where S : Screen {
+abstract class RouterChannel<S>(private val router: Router,
+                                private val channel: Channel<(Router) -> Unit>) where S : Screen {
 
-    protected val scope = CoroutineScope(Dispatchers.Main)
-    protected var job: Job? = null
+    private val scope = CoroutineScope(Dispatchers.Main)
+    private var job: Job? = null
 
     fun start() {
         job = scope.launch { for (action in channel) action(router) }

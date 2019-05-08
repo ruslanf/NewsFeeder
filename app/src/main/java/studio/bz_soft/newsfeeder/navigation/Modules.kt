@@ -1,7 +1,6 @@
 package studio.bz_soft.newsfeeder.navigation
 
 import android.content.Context
-import kotlinx.coroutines.NonCancellable.start
 import kotlinx.coroutines.channels.Channel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -10,7 +9,9 @@ import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
 import studio.bz_soft.newsfeeder.data.Repository
+import studio.bz_soft.newsfeeder.data.RepositoryInterface
 import studio.bz_soft.newsfeeder.data.http.ApiClient
+import studio.bz_soft.newsfeeder.data.http.ApiClientInterface
 import studio.bz_soft.newsfeeder.root.App
 import studio.bz_soft.newsfeeder.root.Constants
 import studio.bz_soft.newsfeeder.root.MainRouter
@@ -18,8 +19,10 @@ import studio.bz_soft.newsfeeder.root.MainRouter
 val appModule = module {
     single { androidApplication() as App }
     factory { (name: String) -> get<App>().getSharedPreferences(name, Context.MODE_PRIVATE) }
-    single { ApiClient(Constants.API_MAIN_URL, androidContext()) }
-    single { Repository(get()) }
+
+    single { ApiClient(Constants.API_MAIN_URL, androidContext()) as ApiClientInterface }
+
+    single { Repository(get()) as RepositoryInterface}
 }
 
 val navigatorModule = module {
