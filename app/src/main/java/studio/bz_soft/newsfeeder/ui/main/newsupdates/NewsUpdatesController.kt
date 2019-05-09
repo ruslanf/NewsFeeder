@@ -11,6 +11,7 @@ import studio.bz_soft.newsfeeder.data.models.Article
 import studio.bz_soft.newsfeeder.data.models.NewsModel
 import studio.bz_soft.newsfeeder.root.Constants
 import studio.bz_soft.newsfeeder.root.MainRouter
+import studio.bz_soft.newsfeeder.root.Screens
 
 class NewsUpdatesController(
         private val router: MainRouter,
@@ -26,16 +27,18 @@ class NewsUpdatesController(
     override suspend fun onIntent(intent: NewsUpdatesIntent) {
         return when (intent) {
             NewsUpdatesIntent.Back -> onBackPressed()
-            is NewsUpdatesIntent.SelectNews -> TODO()
+            is NewsUpdatesIntent.SelectNews -> router.navigateTo(Screens.DetailedNewsScreen(intent.news))
         }
     }
 
     override fun renderDiff(oldState: NewsUpdatesState, newState: NewsUpdatesState): List<NewsUpdatesRender> {
         return listOfNotNull(
                 showProgressBar(newState).takeIf { it != showProgressBar(oldState) }?.let {
-                    NewsUpdatesRender.ProgressBarRender(it) },
+                    NewsUpdatesRender.ProgressBarRender(it)
+                },
                 showNews(newState).takeIf { it != showNews(oldState) }?.let {
-                    NewsUpdatesRender.ListNewsRender(it) }
+                    NewsUpdatesRender.ListNewsRender(it)
+                }
         )
     }
 
@@ -46,7 +49,7 @@ class NewsUpdatesController(
         )
     }
 
-    private fun showNews(state: NewsUpdatesState) : List<Article> {
+    private fun showNews(state: NewsUpdatesState): List<Article> {
         return when (val news = state.news) {
             is LoadModel.Model -> news.value.listOfArticles
             else -> emptyList()

@@ -8,4 +8,6 @@
     <dimen name="card_margin">4dp</dimen>
     <dimen name="card_radius">25dp</dimen>
     <dimen name="card_image_size">100dp</dimen>
+
+    <dimen name="back_button_size">28dp</dimen>
 </resources>
