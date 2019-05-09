@@ -35,9 +35,13 @@ class DetailedNewsFragment : MVIFragment(), BackPressedInterface {
     private fun renderArticle(v: View, news: Article) {
         v.apply {
             Glide.with(v).load(news.image).into(ivNews)
+            tvAuthor.text = news.author
             tvDate.text = news.dateOfPublish
             tvTitle.text = news.title
-            tvContent.text = news.content
+            tvContent.apply {
+                text = news.content
+                setOnClickListener { controller.sendIntent(DetailedNewsIntent.NewsLink(news.url)) }
+            }
         }
     }
 

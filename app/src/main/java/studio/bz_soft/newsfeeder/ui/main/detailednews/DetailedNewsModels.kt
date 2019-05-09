@@ -11,6 +11,7 @@ data class DetailedNewsState(
 
 sealed class DetailedNewsIntent {
     object Back : DetailedNewsIntent()
+    data class NewsLink(val url: String) : DetailedNewsIntent()
 }
 
 sealed class DetailedNewsRender {

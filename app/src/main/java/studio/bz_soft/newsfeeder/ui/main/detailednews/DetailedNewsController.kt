@@ -24,11 +24,12 @@ class DetailedNewsController(
     override suspend fun onIntent(intent: DetailedNewsIntent) {
         return when (intent) {
             DetailedNewsIntent.Back -> onBackButtonPressed()
+            is DetailedNewsIntent.NewsLink -> TODO()
         }
     }
 
     private fun onBackButtonPressed() {
-        router.exit()
+        router.backTo(Screens.NewsUpdatesScreen)
     }
 
     override fun renderDiff(oldState: DetailedNewsState, newState: DetailedNewsState): List<DetailedNewsRender> {
