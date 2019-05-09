@@ -1,4 +1,4 @@
-package studio.bz_soft.newsfeeder.navigation
+package studio.bz_soft.newsfeeder.di
 
 import android.content.Context
 import kotlinx.coroutines.channels.Channel
