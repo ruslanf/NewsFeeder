@@ -16,26 +16,19 @@ import studio.bz_soft.newsfeeder.ui.main.newsupdates.NewsUpdatesFragment
 class MainFragment : MVIFragment(), BackPressedInterface {
 
     private val controller: MainController by registered(
-        { v, r -> render(v, r) },
-        { v, a -> action(v, a) }
-    ) { MainController(get(), get()) }
+        { _, r -> render(r) }
+    ) { MainController(get()) }
 
     private val newsUpdatesFragment = NewsUpdatesFragment.instance()
     private val moreFragment = MoreFragment.instance()
 
-    private fun render(v: View, r: MainRender) {
+    private fun render(r: MainRender) {
         return when (r) {
-            is MainRender.RenderScreen -> renderFragment(v, r.screen)
+            is MainRender.RenderScreen -> renderFragment(r.screen)
         }
     }
 
-    private fun renderFragment(v: View, screen: MainScreens) {
-        val currentFragment = childFragmentManager.findFragmentById(v.flMain.id)
-        when {
-            currentFragment is NewsUpdatesFragment && screen is MainScreens.NewsUpdates -> return
-            currentFragment is MoreFragment && screen is MainScreens.More -> return
-        }
-
+    private fun renderFragment(screen: MainScreens) {
         val fragment: Fragment = when (screen) {
             is MainScreens.NewsUpdates -> newsUpdatesFragment
             is MainScreens.More -> moreFragment
@@ -45,10 +38,6 @@ class MainFragment : MVIFragment(), BackPressedInterface {
             .hide(moreFragment)
             .show(fragment)
             .commit()
-    }
-
-    private fun action(v: View, a: MainAction) {
-
     }
 
     private fun getCurrentFragment(): Fragment? =
@@ -65,6 +54,11 @@ class MainFragment : MVIFragment(), BackPressedInterface {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.apply {
+            childFragmentManager.beginTransaction()
+                    .add(R.id.flMain, newsUpdatesFragment)
+                    .add(R.id.flMain, moreFragment)
+                    .commit()
+
             mainBottomNavigationMenu.setOnNavigationItemSelectedListener {
                 when (it.itemId) {
                     R.id.menuTitleNewsUpdates -> {

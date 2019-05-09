@@ -12,6 +12,7 @@ sealed class MainIntent {
     object Back : MainIntent()
     data class OnNavigate(val screen: MainScreens) : MainIntent()
 }
+
 sealed class MainAction
 
 sealed class MainRender {

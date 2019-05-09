@@ -9,7 +9,6 @@ import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
 import studio.bz_soft.newsfeeder.data.Repository
-import studio.bz_soft.newsfeeder.data.RepositoryInterface
 import studio.bz_soft.newsfeeder.data.http.ApiClient
 import studio.bz_soft.newsfeeder.data.http.ApiClientInterface
 import studio.bz_soft.newsfeeder.root.App
@@ -22,7 +21,7 @@ val appModule = module {
 
     single { ApiClient(Constants.API_MAIN_URL, androidContext()) as ApiClientInterface }
 
-    single { Repository(get()) as RepositoryInterface}
+    single { Repository(get()) }
 }
 
 val navigatorModule = module {
