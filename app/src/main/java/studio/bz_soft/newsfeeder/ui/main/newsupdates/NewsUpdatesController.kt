@@ -28,6 +28,7 @@ class NewsUpdatesController(
         return when (intent) {
             NewsUpdatesIntent.Back -> onBackPressed()
             is NewsUpdatesIntent.SelectNews -> router.navigateTo(Screens.DetailedNewsScreen(intent.news))
+            is NewsUpdatesIntent.Refresh -> onRefresh()
         }
     }
 
@@ -38,15 +39,22 @@ class NewsUpdatesController(
                 },
                 showNews(newState).takeIf { it != showNews(oldState) }?.let {
                     NewsUpdatesRender.ListNewsRender(it)
-                }
+                },
+                newState.takeIf { it != oldState }?.let { NewsUpdatesRender.SwipeRefreshRender(it.isRefreshing) }
         )
     }
 
     override fun renderState(state: NewsUpdatesState): List<NewsUpdatesRender> {
         return listOfNotNull(
                 NewsUpdatesRender.ListNewsRender(showNews(state)),
-                NewsUpdatesRender.ProgressBarRender(showProgressBar(state))
+                NewsUpdatesRender.ProgressBarRender(showProgressBar(state)),
+                NewsUpdatesRender.SwipeRefreshRender(state.isRefreshing)
         )
+    }
+
+    private suspend fun onRefresh() {
+        changeState { it.copy(isRefreshing = true) }
+        getBBCNews()
     }
 
     private fun showNews(state: NewsUpdatesState): List<Article> {
@@ -74,6 +82,7 @@ class NewsUpdatesController(
                             is Err -> LoadModel.Error<NewsModel>(r.error)
                         }
                         changeState { it.copy(news = listOfNews) }
+                        changeState { it.copy(isRefreshing = false) }
                     }.let { job -> changeState { it.copy(news = LoadModel.Load(job)) } }
                 }
             }

@@ -69,6 +69,7 @@ class DetailedNewsFragment : MVIFragment(), BackPressedInterface {
     }
 
     override fun onBackPressed(): Boolean {
+        controller.sendIntent(DetailedNewsIntent.Back)
         return true
     }
 
