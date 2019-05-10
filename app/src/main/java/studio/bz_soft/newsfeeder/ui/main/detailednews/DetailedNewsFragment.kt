@@ -14,6 +14,7 @@ import studio.bz_soft.mvilibrary.mvi.MVIFragment
 import studio.bz_soft.newsfeeder.R
 import studio.bz_soft.newsfeeder.data.models.Article
 import studio.bz_soft.newsfeeder.root.BackPressedInterface
+import studio.bz_soft.newsfeeder.root.common.transformDate
 
 class DetailedNewsFragment : MVIFragment(), BackPressedInterface {
 
@@ -35,7 +36,7 @@ class DetailedNewsFragment : MVIFragment(), BackPressedInterface {
                 .load(news.image)
                 .into(ivNews)
             tvAuthor.text = news.author
-            tvDate.text = news.dateOfPublish
+            tvDate.text = transformDate(news.dateOfPublish)
             tvTitle.text = news.title
             tvContent.apply {
                 text = news.content

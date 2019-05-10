@@ -8,6 +8,7 @@ import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.news_cell.view.*
 import studio.bz_soft.newsfeeder.R
 import studio.bz_soft.newsfeeder.data.models.Article
+import studio.bz_soft.newsfeeder.root.common.transformDate
 import studio.bz_soft.newsfeeder.root.delegated.AdapterDelegateInterface
 import studio.bz_soft.newsfeeder.root.delegated.BaseHolder
 
@@ -26,7 +27,7 @@ class NewsItemHolder(v: View, val onClick: (Article) -> Unit) : BaseHolder<NewsE
                     .apply(RequestOptions.circleCropTransform())
                     .into(ivNews)
                 tvNewsTitle.text = item.news.title
-                tvNewsDate.text = item.news.dateOfPublish
+                tvNewsDate.text = transformDate(item.news.dateOfPublish)
                 setOnClickListener { onClick(item.news) }
             }
         }
