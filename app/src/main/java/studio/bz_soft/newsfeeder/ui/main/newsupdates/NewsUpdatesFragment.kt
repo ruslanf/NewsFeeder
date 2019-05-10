@@ -6,8 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import kotlinx.android.synthetic.main.fragment_news_updates.*
 import kotlinx.android.synthetic.main.fragment_news_updates.view.*
 import org.koin.android.ext.android.get
 import studio.bz_soft.mvilibrary.mvi.MVIFragment
@@ -30,12 +28,15 @@ class NewsUpdatesFragment : MVIFragment(), BackPressedInterface {
         return when (r) {
             is NewsUpdatesRender.ListNewsRender -> renderNews(r.news)
             is NewsUpdatesRender.ProgressBarRender -> renderProgressBar(v, r.isShown)
-            is NewsUpdatesRender.SwipeRefreshRender -> renderSwipeRefresh(v, r.isRefreshing)
+            is NewsUpdatesRender.SwipeRefreshRender -> renderSwipeRefresh(v, r.refreshing)
         }
     }
 
-    private fun renderSwipeRefresh(v: View, refreshing: Boolean) {
-        v.swipeRefresh.isRefreshing = refreshing
+    private fun renderSwipeRefresh(v: View, refreshing: RefreshStatus) {
+        v.swipeRefresh.isRefreshing = when (refreshing) {
+            RefreshStatus.REFRESHED -> false
+            else -> true
+        }
     }
 
     private fun renderNews(news: List<Article>) {
@@ -47,9 +48,11 @@ class NewsUpdatesFragment : MVIFragment(), BackPressedInterface {
     }
 
     private fun renderProgressBar(v: View, isShown: Boolean) {
-        v.progressBar.visibility = when (isShown) {
-            true -> View.VISIBLE
-            false -> View.GONE
+        v.apply {
+            progressBar.visibility = when (isShown) {
+                true -> View.VISIBLE
+                false -> View.GONE
+            }
         }
     }
 
@@ -62,10 +65,7 @@ class NewsUpdatesFragment : MVIFragment(), BackPressedInterface {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.apply {
-            swipeRefresh.apply {
-                isRefreshing = false
-                setOnRefreshListener { controller.sendIntent(NewsUpdatesIntent.Refresh) }
-            }
+            swipeRefresh.setOnRefreshListener { controller.sendIntent(NewsUpdatesIntent.Refresh) }
 
             recyclerViewNews.apply {
                 adapter = dAdapter
@@ -77,11 +77,6 @@ class NewsUpdatesFragment : MVIFragment(), BackPressedInterface {
     override fun onBackPressed(): Boolean {
         return true
     }
-
-//    override fun onRefresh() {
-//        swipeRefresh.isRefreshing = false
-//        controller.sendIntent(NewsUpdatesIntent.Refresh)
-//    }
 
     companion object {
         fun instance(): NewsUpdatesFragment = NewsUpdatesFragment()

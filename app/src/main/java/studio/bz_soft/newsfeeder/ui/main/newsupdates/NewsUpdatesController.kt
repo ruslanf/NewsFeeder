@@ -32,29 +32,41 @@ class NewsUpdatesController(
         }
     }
 
-    override fun renderDiff(oldState: NewsUpdatesState, newState: NewsUpdatesState): List<NewsUpdatesRender> {
-        return listOfNotNull(
-                showProgressBar(newState).takeIf { it != showProgressBar(oldState) }?.let {
-                    NewsUpdatesRender.ProgressBarRender(it)
-                },
-                showNews(newState).takeIf { it != showNews(oldState) }?.let {
-                    NewsUpdatesRender.ListNewsRender(it)
-                },
-                newState.takeIf { it != oldState }?.let { NewsUpdatesRender.SwipeRefreshRender(it.isRefreshing) }
-        )
-    }
+    override fun renderDiff(oldState: NewsUpdatesState,
+                            newState: NewsUpdatesState): List<NewsUpdatesRender> = listOfNotNull(
+            showProgressBar(newState).takeIf { it != showProgressBar(oldState) }?.let {
+                NewsUpdatesRender.ProgressBarRender(it)
+            },
+            showNews(newState).takeIf { it != showNews(oldState) }?.let {
+                NewsUpdatesRender.ListNewsRender(it)
+            },
+            newState.takeIf { it != oldState }?.let {
+                NewsUpdatesRender.SwipeRefreshRender(it.refreshing)
+            }
+    )
 
-    override fun renderState(state: NewsUpdatesState): List<NewsUpdatesRender> {
-        return listOfNotNull(
-                NewsUpdatesRender.ListNewsRender(showNews(state)),
-                NewsUpdatesRender.ProgressBarRender(showProgressBar(state)),
-                NewsUpdatesRender.SwipeRefreshRender(state.isRefreshing)
-        )
-    }
+
+    override fun renderState(state: NewsUpdatesState): List<NewsUpdatesRender> = listOfNotNull(
+            NewsUpdatesRender.ListNewsRender(showNews(state)),
+            NewsUpdatesRender.ProgressBarRender(showProgressBar(state)),
+            NewsUpdatesRender.SwipeRefreshRender(state.refreshing)
+    )
+
 
     private suspend fun onRefresh() {
-        changeState { it.copy(isRefreshing = true) }
-        getBBCNews()
+        changeState { it.copy(refreshing = RefreshStatus.NOT_REFRESHED) }
+        withState { state ->
+            if (state.refreshing == RefreshStatus.NOT_REFRESHED) {
+                scope.launch {
+                    val listOfNews = when (val r = repository.getBBCNews(Constants.API_ACCESS_KEY)) {
+                        is Ok -> LoadModel.Model(r.value)
+                        is Err -> LoadModel.Error<NewsModel>(r.error)
+                    }
+                    changeState { it.copy(news = listOfNews) }
+                    changeState { it.copy(refreshing = RefreshStatus.REFRESHED) }
+                }
+            }
+        }
     }
 
     private fun showNews(state: NewsUpdatesState): List<Article> {
@@ -82,7 +94,7 @@ class NewsUpdatesController(
                             is Err -> LoadModel.Error<NewsModel>(r.error)
                         }
                         changeState { it.copy(news = listOfNews) }
-                        changeState { it.copy(isRefreshing = false) }
+                        changeState { it.copy(refreshing = RefreshStatus.REFRESHED) }
                     }.let { job -> changeState { it.copy(news = LoadModel.Load(job)) } }
                 }
             }
