@@ -4,7 +4,7 @@ import studio.bz_soft.mvilibrary.common.LoadModel
 import studio.bz_soft.newsfeeder.data.models.Article
 import studio.bz_soft.newsfeeder.data.models.NewsModel
 
-enum class RefreshStatus {NOT_REFRESHED, REFRESHING, REFRESHED}
+enum class RefreshStatus {NOT_REFRESHED, REFRESHED}
 
 data class NewsUpdatesState(
         val news: LoadModel<NewsModel> = LoadModel.Promised(),

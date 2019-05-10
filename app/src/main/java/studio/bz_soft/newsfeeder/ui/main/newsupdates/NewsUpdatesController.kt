@@ -45,28 +45,15 @@ class NewsUpdatesController(
             }
     )
 
-
     override fun renderState(state: NewsUpdatesState): List<NewsUpdatesRender> = listOfNotNull(
             NewsUpdatesRender.ListNewsRender(showNews(state)),
             NewsUpdatesRender.ProgressBarRender(showProgressBar(state)),
             NewsUpdatesRender.SwipeRefreshRender(state.refreshing)
     )
 
-
     private suspend fun onRefresh() {
         changeState { it.copy(refreshing = RefreshStatus.NOT_REFRESHED) }
-        withState { state ->
-            if (state.refreshing == RefreshStatus.NOT_REFRESHED) {
-                scope.launch {
-                    val listOfNews = when (val r = repository.getBBCNews(Constants.API_ACCESS_KEY)) {
-                        is Ok -> LoadModel.Model(r.value)
-                        is Err -> LoadModel.Error<NewsModel>(r.error)
-                    }
-                    changeState { it.copy(news = listOfNews) }
-                    changeState { it.copy(refreshing = RefreshStatus.REFRESHED) }
-                }
-            }
-        }
+        getBBCNews()
     }
 
     private fun showNews(state: NewsUpdatesState): List<Article> {
@@ -88,16 +75,28 @@ class NewsUpdatesController(
         return withState { state ->
             when (state.news) {
                 is LoadModel.Promised -> {
-                    scope.launch {
-                        val listOfNews = when (val r = repository.getBBCNews(Constants.API_ACCESS_KEY)) {
-                            is Ok -> LoadModel.Model(r.value)
-                            is Err -> LoadModel.Error<NewsModel>(r.error)
-                        }
-                        changeState { it.copy(news = listOfNews) }
-                        changeState { it.copy(refreshing = RefreshStatus.REFRESHED) }
-                    }.let { job -> changeState { it.copy(news = LoadModel.Load(job)) } }
+                    getNews()
+                }
+                is LoadModel.Model -> {
+                    getNews()
                 }
             }
         }
+    }
+
+    private suspend fun getNews() {
+        scope.launch {
+            val listOfNews = when (val r = repository.getBBCNews(Constants.API_ACCESS_KEY)) {
+                is Ok -> {
+                    changeState { it.copy(refreshing = RefreshStatus.REFRESHED) }
+                    LoadModel.Model(r.value)
+                }
+                is Err -> {
+                    changeState { it.copy(refreshing = RefreshStatus.NOT_REFRESHED) }
+                    LoadModel.Error<NewsModel>(r.error)
+                }
+            }
+            changeState { it.copy(news = listOfNews) }
+        }.let { job -> changeState { it.copy(news = LoadModel.Load(job)) } }
     }
 }
