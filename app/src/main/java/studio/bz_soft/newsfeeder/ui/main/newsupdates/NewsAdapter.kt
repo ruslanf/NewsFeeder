@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.news_cell.view.*
 import studio.bz_soft.newsfeeder.R
 import studio.bz_soft.newsfeeder.data.models.Article
@@ -20,7 +21,10 @@ class NewsItemHolder(v: View, val onClick: (Article) -> Unit) : BaseHolder<NewsE
         super.bindModel(item)
         when (item) {
             is NewsElements.NewsItem -> itemView.apply {
-                Glide.with(itemView).load(item.news.image).into(ivNews)
+                Glide.with(itemView)
+                    .load(item.news.image)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(ivNews)
                 tvNewsTitle.text = item.news.title
                 tvNewsDate.text = item.news.dateOfPublish
                 setOnClickListener { onClick(item.news) }

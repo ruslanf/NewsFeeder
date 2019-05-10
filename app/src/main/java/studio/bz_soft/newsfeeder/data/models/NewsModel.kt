@@ -4,12 +4,13 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 import kotlinx.android.parcel.RawValue
+import java.io.Serializable
 
 data class NewsModel(
         @SerializedName("status") val status: String,
         @SerializedName("totalResults") val total: Int,
         @SerializedName("articles") val listOfArticles: List<Article>
-)
+) : Serializable
 
 @Parcelize
 data class Article(
@@ -22,11 +23,12 @@ data class Article(
     @SerializedName("publishedAt") val dateOfPublish: String,
     @SerializedName("content") val content: String
 ) : Parcelable {
-    constructor() : this(Source("", ""), "", "", "",
+    constructor() : this(
+        Source("", ""), "", "", "",
         "", "", "", "")
 }
 
 data class Source(
         @SerializedName("id") val id: String,
         @SerializedName("name") val channelName: String
-)
+) : Serializable

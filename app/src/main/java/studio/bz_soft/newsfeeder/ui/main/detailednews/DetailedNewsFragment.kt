@@ -1,9 +1,11 @@
 package studio.bz_soft.newsfeeder.ui.main.detailednews
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.browser.customtabs.CustomTabsIntent
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.fragment_detailed_news.view.*
 import kotlinx.coroutines.CompletableDeferred
@@ -18,13 +20,8 @@ class DetailedNewsFragment : MVIFragment(), BackPressedInterface {
     private val news = CompletableDeferred<Article>()
 
     private val controller: DetailedNewsController by registered(
-            { v, r -> render(v, r)},
-            { v, a -> action(v, a)}
-    ) { DetailedNewsController(get(), get(), news) }
-
-    private fun action(v: View, a: DetailedNewsAction) {
-
-    }
+            { v, r -> render(v, r)}
+    ) { DetailedNewsController(get(), news) }
 
     private fun render(v: View, r: DetailedNewsRender) {
         return when (r) {
@@ -34,15 +31,22 @@ class DetailedNewsFragment : MVIFragment(), BackPressedInterface {
 
     private fun renderArticle(v: View, news: Article) {
         v.apply {
-            Glide.with(v).load(news.image).into(ivNews)
+            Glide.with(v)
+                .load(news.image)
+                .into(ivNews)
             tvAuthor.text = news.author
             tvDate.text = news.dateOfPublish
             tvTitle.text = news.title
             tvContent.apply {
                 text = news.content
-                setOnClickListener { controller.sendIntent(DetailedNewsIntent.NewsLink(news.url)) }
+                setOnClickListener { onLinkPressed(news.url) }
             }
         }
+    }
+
+    private fun onLinkPressed(url: String) {
+        val customTabs = CustomTabsIntent.Builder().build()
+        customTabs.launchUrl(context, Uri.parse(url))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

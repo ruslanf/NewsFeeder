@@ -11,4 +11,24 @@
     <style name="SplashScreen">
         <item name="android:windowBackground">@drawable/splash_screen</item>
     </style>
+
+    <style name="DetailedNews">
+        <item name="android:background">@color/primaryLightColor</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="MainTextStyle">
+    </style>
+
+    <style name="TitleTextStyle" parent="MainTextStyle">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="ContentTextStyle" parent="MainTextStyle">
+        <item name="android:textStyle">italic</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:gravity">start</item>
+    </style>
 </resources>

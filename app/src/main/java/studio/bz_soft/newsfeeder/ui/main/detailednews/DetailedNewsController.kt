@@ -3,14 +3,12 @@ package studio.bz_soft.newsfeeder.ui.main.detailednews
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import studio.bz_soft.mvilibrary.mvi.MVILifecycleController
-import studio.bz_soft.newsfeeder.data.Repository
 import studio.bz_soft.newsfeeder.data.models.Article
 import studio.bz_soft.newsfeeder.root.MainRouter
 import studio.bz_soft.newsfeeder.root.Screens
 
 class DetailedNewsController(
     private val router: MainRouter,
-    private val repository: Repository,
     private val news: Deferred<Article>
 ) : MVILifecycleController<DetailedNewsState, DetailedNewsIntent, DetailedNewsRender,
         DetailedNewsAction>(DetailedNewsState()) {
@@ -24,7 +22,6 @@ class DetailedNewsController(
     override suspend fun onIntent(intent: DetailedNewsIntent) {
         return when (intent) {
             DetailedNewsIntent.Back -> onBackButtonPressed()
-            is DetailedNewsIntent.NewsLink -> TODO()
         }
     }
 
