@@ -4,7 +4,6 @@ import android.content.Context
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Cache
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -16,8 +15,8 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 class ApiClient(
-    private val apiURL: String,
-    appContext: Context
+        private val apiURL: String,
+        private val appContext: Context
 ) : ApiClientInterface {
 
     private val retrofitClient by lazy { createRetrofitClient(apiURL) }
@@ -27,22 +26,19 @@ class ApiClient(
     private val httpCacheDirectory = File(appContext.cacheDir, "offlineCache")
     private val httpCache = Cache(httpCacheDirectory, cacheSize)
 
-    private fun httpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .cache(httpCache)
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-            .addNetworkInterceptor(cacheInterceptor())
-            .addInterceptor(offlineCacheInterceptor())
-            .build()
-    }
+    private fun httpClient(): OkHttpClient =
+            OkHttpClient.Builder()
+                    .cache(httpCache)
+                    .addNetworkInterceptor(cacheInterceptor())
+                    .addInterceptor(offlineCacheInterceptor(appContext))
+                    .build()
 
-    private fun createRetrofitClient(apiURL: String): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(apiURL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(httpClient())
-            .build()
-    }
+    private fun createRetrofitClient(apiURL: String): Retrofit =
+            Retrofit.Builder()
+                    .baseUrl(apiURL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(httpClient())
+                    .build()
 
     override suspend fun getCurrentBBCNews(api: String): NewsModel {
         return apiClient.currentBBCNews(api).await()

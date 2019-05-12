@@ -1,48 +1,48 @@
 package studio.bz_soft.newsfeeder.data.http
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import okhttp3.CacheControl
 import okhttp3.Interceptor
 import java.util.concurrent.TimeUnit
 
+const val HEADER_PRAGMA = "Pragma"
+const val HEADER_CACHE_CONTROL = "Cache-Control"
+
 fun cacheInterceptor(): Interceptor = Interceptor { chain ->
-    var request = chain.request()
-    val originalResponse = chain.proceed(request)
-    val cacheControl = originalResponse.header("Cache-Control")
+    val response = chain.proceed(chain.request())
 
-    if (cacheControl == null ||
-        cacheControl.contains("no-store") ||
-        cacheControl.contains("no-cache") ||
-        cacheControl.contains("must-revalidate") ||
-        cacheControl.contains("max-stale = 60 * 60 * 24 * 7")
-    ) {
-        val cc = CacheControl.Builder()
-            .maxStale(1, TimeUnit.DAYS)
+    val cacheControl = CacheControl.Builder()
+            .maxAge(60, TimeUnit.SECONDS)
             .build()
 
-        request = request.newBuilder()
-            .removeHeader("Pragma")
-            .cacheControl(cc)
+    return@Interceptor response.newBuilder()
+            .removeHeader(HEADER_PRAGMA)
+            .removeHeader(HEADER_CACHE_CONTROL)
+            .header(HEADER_CACHE_CONTROL, cacheControl.toString())
             .build()
-        chain.proceed(request)
-    } else {
-        originalResponse
-    }
 }
 
-fun offlineCacheInterceptor(): Interceptor = Interceptor { chain ->
-    val request = chain.request()
-    try {
-        chain.proceed(request)
-    } catch (ex: Exception) {
+fun offlineCacheInterceptor(context: Context): Interceptor = Interceptor { chain ->
+    var request = chain.request()
+    if (!hasNetwork(context)) {
         val cacheControl = CacheControl.Builder()
-            .onlyIfCached()
-            .maxStale(1, TimeUnit.DAYS)
-            .build()
+                .onlyIfCached()
+                .maxStale(30, TimeUnit.DAYS)
+                .build()
 
-        val offlineRequest = request.newBuilder()
-            .removeHeader("Pragma")
-            .cacheControl(cacheControl)
-            .build()
-        chain.proceed(offlineRequest)
+        request = request.newBuilder()
+                .removeHeader(HEADER_PRAGMA)
+                .removeHeader(HEADER_CACHE_CONTROL)
+                .cacheControl(cacheControl)
+                .build()
     }
+    chain.proceed(request)
+}
+
+private fun hasNetwork(context: Context): Boolean {
+    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
+    return (activeNetwork != null && activeNetwork.isConnected)
 }
