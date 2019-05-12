@@ -3,10 +3,5 @@
     android:opacity="opaque">
 
     <item android:drawable="@color/splashScreen"/>
-    <item>
-        <bitmap
-            android:gravity="center"
-            android:src="@drawable/ic_droid" />
-    </item>
 
 </layer-list>

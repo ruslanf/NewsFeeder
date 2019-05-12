@@ -9,6 +9,6 @@
     <color name="primaryDarkColor">#102027</color>
     <color name="primaryTextColor">#ffffff</color>
 
-    <color name="splashScreen">#37474f</color>
+    <color name="splashScreen">#62727b</color>
     <color name="cardViewTransparent">#80808080</color>
 </resources>
